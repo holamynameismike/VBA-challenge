@@ -1,0 +1,75 @@
+Sub Function2()
+
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.ActiveSheet
+    
+    Dim LastRow As Long
+    LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+    
+    Dim i As Long
+    Dim SummaryRow As Long
+    SummaryRow = 2
+    
+    Dim openingPrice As Double
+    Dim closingPrice As Double
+    Dim YearlyChange As Double
+    Dim PercentChange As Double
+    Dim TotalVolume As Double
+    TotalVolume = 0
+    
+    Dim maxPercentIncrease As Double
+    Dim maxPercentDecrease As Double
+    Dim maxTotalVolume As Double
+    Dim maxPercentIncreaseTicker As String
+    Dim maxPercentDecreaseTicker As String
+    Dim maxTotalVolumeTicker As String
+    
+    maxPercentIncrease = 0
+    maxPercentDecrease = 0
+    maxTotalVolume = 0
+    
+    openingPrice = ws.Cells(2, 3).Value
+    
+    For i = 2 To LastRow
+        If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+            closingPrice = ws.Cells(i, 6).Value
+            YearlyChange = closingPrice - openingPrice
+            PercentChange = (YearlyChange / openingPrice) * 100
+            TotalVolume = TotalVolume + ws.Cells(i, 7).Value
+            
+            ws.Cells(SummaryRow, 9).Value = ws.Cells(i, 1).Value
+            ws.Cells(SummaryRow, 10).Value = YearlyChange
+            ws.Cells(SummaryRow, 11).Value = PercentChange
+            ws.Cells(SummaryRow, 12).Value = TotalVolume
+            
+            If PercentChange > maxPercentIncrease Then
+                maxPercentIncrease = PercentChange
+                maxPercentIncreaseTicker = ws.Cells(i, 1).Value
+            End If
+            
+            If PercentChange < maxPercentDecrease Then
+                maxPercentDecrease = PercentChange
+                maxPercentDecreaseTicker = ws.Cells(i, 1).Value
+            End If
+            
+            If TotalVolume > maxTotalVolume Then
+                maxTotalVolume = TotalVolume
+                maxTotalVolumeTicker = ws.Cells(i, 1).Value
+            End If
+            
+            SummaryRow = SummaryRow + 1
+            openingPrice = ws.Cells(i + 1, 3).Value
+            TotalVolume = 0
+        Else
+            TotalVolume = TotalVolume + ws.Cells(i, 7).Value
+        End If
+    Next i
+    
+    ws.Cells(2, 17).Value = maxPercentIncreaseTicker
+    ws.Cells(2, 18).Value = maxPercentIncrease
+    ws.Cells(3, 17).Value = maxPercentDecreaseTicker
+    ws.Cells(3, 18).Value = maxPercentDecrease
+    ws.Cells(4, 17).Value = maxTotalVolumeTicker
+    ws.Cells(4, 18).Value = maxTotalVolume
+
+End Sub
